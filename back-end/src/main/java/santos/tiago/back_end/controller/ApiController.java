@@ -5,14 +5,12 @@ import org.jspecify.annotations.NonNull;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import santos.tiago.back_end.model.User;
 import santos.tiago.back_end.repository.UserRepository;
 import santos.tiago.back_end.service.UserService;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -47,7 +45,7 @@ public class ApiController {
     public ResponseEntity<List<String>> getUser(@NonNull @PathVariable String username) {
         Optional<User> user = userRepository.findByUsername(username);
         if (user.isEmpty()) {
-            throw new UsernameNotFoundException("Username not found.");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Username not found.");
         }
         return new ResponseEntity<>(List.of(user.get().getUsername(), user.get().getRole().getDescription()), HttpStatus.OK);
     }
