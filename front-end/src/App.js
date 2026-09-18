@@ -1,10 +1,7 @@
-import React from 'react';
-import Home from './Home';
+import Navigator from './Navigator';
 
-class App extends React.Component {
-  render() {
-    return <Home />
-  }
+function App(){
+  return <Navigator />
 }
 
 export default App;

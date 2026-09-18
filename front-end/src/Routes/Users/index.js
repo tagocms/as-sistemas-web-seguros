@@ -1,9 +1,12 @@
-import React from 'react';
+import { useContext } from "react";
+import { AuthContext } from "../../context/AuthContext";
 
-class Users extends React.Component {
-    render() {
-        return <>Users</>
-    }
+function Users() {
+    const { logout } = useContext(AuthContext);
+
+    return (
+        <button onClick={logout}>Logout</button>
+    )
 }
 
 export default Users;
