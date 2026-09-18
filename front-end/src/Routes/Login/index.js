@@ -1,24 +1,23 @@
-import { useContext, useState } from 'react';
+import { useState } from 'react';
 import api from '../../services/api';
-import { AuthContext } from '../../context/AuthContext';
+import { login } from '../../services/authService';
+import { ENDPOINTS } from '../../constants/endpoints';
 
 function Login() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
 
-    const { login } = useContext(AuthContext);
-
     const basicAuthenticationToken = () => `Basic ${btoa(username + ":" + password)}`;
     const attemptLogin = async () => {
         try {  
-            const response = await api.post("/autenticar", {}, {
+            const response = await api.post(ENDPOINTS.AUTHENTICATE, {}, {
                 headers: {
                     "Authorization": basicAuthenticationToken(),
                 }  
             });
             login(response.data);
         } catch (e) {
-            console.log(e);
+            console.error("Login attempt failed: \n" + e);
         }
     }
 
