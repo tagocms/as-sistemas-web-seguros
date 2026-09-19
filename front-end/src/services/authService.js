@@ -48,6 +48,14 @@ export const getUserScopes = () => {
     }
     return [];
 };
+export const hasSufficientScopeFor = (scope) => getUserScopes().includes(scope);
+export const getUsername = () => {
+    try {
+        return jwtDecode(getToken()).sub;
+    } catch (e) {
+        return "";
+    }
+};
 
 export const login = token => {
     if (isTokenValid(token)) {
