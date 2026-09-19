@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import santos.tiago.back_end.model.User;
+import santos.tiago.back_end.model.UserResponse;
 import santos.tiago.back_end.repository.UserRepository;
 import santos.tiago.back_end.service.UserService;
 
@@ -28,26 +29,23 @@ public class ApiController {
     }
 
     @GetMapping("/usuarios")
-    public ResponseEntity<List<List<String>>> getUsers() {
-        List<List<String>> target = new ArrayList<>();
+    public ResponseEntity<List<UserResponse>> getUsers() {
+        List<UserResponse> target = new ArrayList<>();
         userRepository.findAll().forEach(
                 (user) -> target.add(
-                        List.of(
-                                user.getUsername(),
-                                user.getRole().getDescription()
-                        )
+                        new UserResponse(user.getUsername(), user.getRole())
                 )
         );
         return new ResponseEntity<>(target, HttpStatus.OK);
     }
 
     @GetMapping("/usuarios/{username}")
-    public ResponseEntity<List<String>> getUser(@NonNull @PathVariable String username) {
+    public ResponseEntity<UserResponse> getUser(@NonNull @PathVariable String username) {
         Optional<User> user = userRepository.findByUsername(username);
         if (user.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Username not found.");
         }
-        return new ResponseEntity<>(List.of(user.get().getUsername(), user.get().getRole().getDescription()), HttpStatus.OK);
+        return new ResponseEntity<>(new UserResponse(user.get().getUsername(), user.get().getRole()), HttpStatus.OK);
     }
 
     @PostMapping("/usuarios")
