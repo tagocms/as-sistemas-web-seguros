@@ -3,14 +3,13 @@ import { Header, LoginSignUpForm } from "../../../components";
 import { useNavigate } from "react-router-dom";
 import api from "../../../../services/api";
 import { ENDPOINTS } from "../../../../constants/endpoints";
-import { getUserScopes, hasSufficientScopeFor } from "../../../../services/authService";
+import { hasSufficientScopeFor } from "../../../../services/authService";
 import { PATH } from "../../../../constants/path";
 
 function User() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
-    const userScopes = getUserScopes();
     const hasSufficientScope = (scope) => hasSufficientScopeFor(scope);
     const navigate = useNavigate();
 
