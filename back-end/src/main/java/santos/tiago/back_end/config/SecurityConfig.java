@@ -44,8 +44,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(
                         auth -> auth
                                 .requestMatchers("/autenticar", "/cadastro").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/api/usuarios/**").hasAuthority("read")
                                 .requestMatchers(HttpMethod.GET, "/api/usuarios").hasAuthority("read")
+                                .requestMatchers(HttpMethod.GET, "/api/usuarios/**").hasAnyAuthority("read", "read_self")
                                 .requestMatchers(HttpMethod.PUT, "/api/usuarios/**").hasAuthority("update")
                                 .requestMatchers(HttpMethod.POST, "/api/usuarios").hasAuthority("create")
                                 .requestMatchers(HttpMethod.DELETE, "/api/usuarios/**").hasAuthority("delete")

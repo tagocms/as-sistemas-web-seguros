@@ -19,7 +19,7 @@ public class UserAuthenticated implements UserDetails {
         return switch (user.getRole()) {
             case ADMIN -> List.of(() -> "read", () -> "update", () -> "create", () -> "delete");
             case OPERATOR -> List.of(() -> "read", () -> "update");
-            case CLIENT -> List.of(() -> "read");
+            case CLIENT -> List.of(() -> "read_self");
         };
     }
 

@@ -5,6 +5,8 @@ import org.jspecify.annotations.NonNull;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import santos.tiago.back_end.model.User;
@@ -13,6 +15,7 @@ import santos.tiago.back_end.repository.UserRepository;
 import santos.tiago.back_end.service.UserService;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -40,12 +43,28 @@ public class ApiController {
     }
 
     @GetMapping("/usuarios/{username}")
-    public ResponseEntity<UserResponse> getUser(@NonNull @PathVariable String username) {
+    public ResponseEntity<UserResponse> getUser(@NonNull @PathVariable String username, Authentication authentication) {
         Optional<User> user = userRepository.findByUsername(username);
         if (user.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Username not found.");
         }
-        return new ResponseEntity<>(new UserResponse(user.get().getUsername(), user.get().getRole()), HttpStatus.OK);
+
+        Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+        boolean containsAuthority = false;
+        for(GrantedAuthority authority: authorities) {
+            String decomposedAuthority = authority.getAuthority();
+            if (decomposedAuthority != null) {
+                if (decomposedAuthority.equals("read")) {
+                    containsAuthority = true;
+                }
+            }
+        }
+
+        if (containsAuthority || user.get().getUsername().equals(authentication.getName())) {
+            return new ResponseEntity<>(new UserResponse(user.get().getUsername(), user.get().getRole()), HttpStatus.OK);
+        } else {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized to read data from user.");
+        }
     }
 
     @PostMapping("/usuarios")
