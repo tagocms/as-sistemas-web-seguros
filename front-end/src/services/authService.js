@@ -49,6 +49,14 @@ export const getUserScopes = () => {
     return [];
 };
 export const hasSufficientScopeFor = (scope) => getUserScopes().includes(scope);
+export const canEditRole = (role) => {
+        switch (role) {
+            case "ADMIN": return hasSufficientScopeFor("create");
+            case "OPERATOR": return hasSufficientScopeFor("update");
+            case "CLIENT": return hasSufficientScopeFor("update");
+            default: return hasSufficientScopeFor("update");
+        }
+};
 export const getUsername = () => {
     try {
         return jwtDecode(getToken()).sub;

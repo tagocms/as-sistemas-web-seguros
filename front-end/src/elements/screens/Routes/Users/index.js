@@ -4,23 +4,15 @@ import { PATH } from "../../../../constants/path";
 import api from "../../../../services/api";
 import { Header } from "../../../components";
 import { useEffect, useState } from "react";
-import { getUsername, getUserScopes, logout } from "../../../../services/authService";
+import { canEditRole, getUsername, hasSufficientScopeFor, logout } from "../../../../services/authService";
 import { translateRole } from "../../../../services/translationService";
 
 function Users() {
     const [users, setUsers] = useState([]);
     const [errorMessage, setErrorMessage] = useState("");
     const [successMessage, setSuccessMessage] = useState("");
-    const userScopes = getUserScopes();
-    const hasSufficientScopeFor = (scope) => userScopes.includes(scope);
-    const canEdit = (role) => {
-        switch (role) {
-            case "Administrador": return hasSufficientScopeFor("create");
-            case "Operador": return hasSufficientScopeFor("update");
-            case "Cliente": return hasSufficientScopeFor("update");
-            default: return hasSufficientScopeFor("update");
-        }
-    };
+    const hasSufficientScope = (scope) => hasSufficientScopeFor(scope);
+    const canEdit = (role) => canEditRole(role);
     const currentUsername = getUsername();
 
     useEffect(() => {
@@ -40,12 +32,6 @@ function Users() {
             try {
                 const response = await api.get(ENDPOINTS.USERS);
                 let data = response.data;
-                data = data.map((userResponse) => {
-                    return {
-                        username: userResponse.username,
-                        role: translateRole(userResponse.role)
-                    }
-                });
                 setUsers(data);
                 setErrorMessage("");
             } catch (e) {
@@ -91,7 +77,7 @@ function Users() {
                                 <th>Nome do usuário</th>
                                 <th>Papel do usuário</th>
                                 <th>Detalhes do usuário</th>
-                                {hasSufficientScopeFor("delete") &&
+                                {hasSufficientScope("delete") &&
                                     <th>Deletar usuário</th>
                                 }
                             </tr>
@@ -102,9 +88,9 @@ function Users() {
                                     return (
                                         <tr key={user.username}>
                                             <td>{user.username}</td>
-                                            <td>{user.role}</td>
+                                            <td>{translateRole(user.role)}</td>
                                             <td><Link to={PATH.USER_FILLED(user.username)}>{canEdit(user.role) ? "Editar" : "Visualizar"}</Link></td>
-                                            {hasSufficientScopeFor("delete") &&
+                                            {hasSufficientScope("delete") &&
                                             <td><button className="users-table-delete-button" onClick={(e) => deleteUser(user.username)}>Deletar</button></td>
                                             }
                                         </tr>
@@ -115,7 +101,7 @@ function Users() {
                     </table>
                 </div>
             }
-            {hasSufficientScopeFor("create") &&
+            {hasSufficientScope("create") &&
                 <div className="table-container">
                     <button className="create-user-button" onClick={createNewUser}>Criar novo usuário</button>
                 </div>
