@@ -10,6 +10,7 @@ function LoginSignUpForm({type, errorMessage, action, username, password, setUse
                 <button type="submit">
                     {type === 'login' && "Realizar o Login"}
                     {type === 'signup' && "Criar conta"}
+                    {type === 'newUser' && "Criar usuário"}
                 </button>
                 {type === 'login' &&
                     <Link to={PATH.SIGNUP}>Criar uma conta</Link>

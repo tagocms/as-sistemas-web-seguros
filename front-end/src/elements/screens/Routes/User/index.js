@@ -1,8 +1,9 @@
 import { useParams } from "react-router-dom";
 import { Header } from "../../../components";
 
-function User() {
-    const {username} = useParams();
+function User({usernameAsProp}) {
+    const params = useParams();
+    const username = usernameAsProp ? usernameAsProp : params.username;
 
     return (
         <div>

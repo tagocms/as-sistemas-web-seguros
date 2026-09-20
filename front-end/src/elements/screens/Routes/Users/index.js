@@ -13,6 +13,14 @@ function Users() {
     const [successMessage, setSuccessMessage] = useState("");
     const userScopes = getUserScopes();
     const hasSufficientScopeFor = (scope) => userScopes.includes(scope);
+    const canEdit = (role) => {
+        switch (role) {
+            case "Administrador": return hasSufficientScopeFor("create");
+            case "Operador": return hasSufficientScopeFor("update");
+            case "Cliente": return hasSufficientScopeFor("update");
+            default: return hasSufficientScopeFor("update");
+        }
+    };
     const currentUsername = getUsername();
 
     useEffect(() => {
@@ -95,7 +103,7 @@ function Users() {
                                         <tr key={user.username}>
                                             <td>{user.username}</td>
                                             <td>{user.role}</td>
-                                            <td><Link to={PATH.USER_FILLED(user.username)}>{hasSufficientScopeFor("update") ? "Editar" : "Visualizar"}</Link></td>
+                                            <td><Link to={PATH.USER_FILLED(user.username)}>{canEdit(user.role) ? "Editar" : "Visualizar"}</Link></td>
                                             {hasSufficientScopeFor("delete") &&
                                             <td><button className="users-table-delete-button" onClick={(e) => deleteUser(user.username)}>Deletar</button></td>
                                             }
@@ -107,9 +115,11 @@ function Users() {
                     </table>
                 </div>
             }
-            <div className="table-container">
-                <button className="create-user-button" onClick={createNewUser}>Criar novo usuário</button>
-            </div>
+            {hasSufficientScopeFor("create") &&
+                <div className="table-container">
+                    <button className="create-user-button" onClick={createNewUser}>Criar novo usuário</button>
+                </div>
+            }
             {errorMessage !== "" &&
                 <div className="message-container">
                     <div className="error-message">
