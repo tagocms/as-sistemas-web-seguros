@@ -12,6 +12,7 @@ import org.springframework.web.server.ResponseStatusException;
 import santos.tiago.back_end.model.User;
 import santos.tiago.back_end.model.UserResponse;
 import santos.tiago.back_end.model.UserRole;
+import santos.tiago.back_end.model.UserRoleRequest;
 import santos.tiago.back_end.repository.UserRepository;
 import santos.tiago.back_end.service.UserService;
 
@@ -94,13 +95,11 @@ public class ApiController {
     }
 
     @PutMapping("/usuarios/{username}")
-    public ResponseEntity<String> updateUser(@NonNull @PathVariable String username, @NonNull @Valid @RequestBody User user, Authentication authentication) {
+    public ResponseEntity<String> updateUserRole(@NonNull @PathVariable String username, @NonNull @Valid @RequestBody UserRoleRequest role, Authentication authentication) {
         Optional<User> userInRepository = userRepository.findByUsername(username);
         if (userInRepository.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Username not found.");
         }
-
-        User userToUpdate = this.userService.createUser(user);
 
         Optional<User> optionalCurrentUser = userRepository.findByUsername(authentication.getName());
         if (optionalCurrentUser.isEmpty()) {
@@ -111,11 +110,10 @@ public class ApiController {
         if (currentUser.getRole() == UserRole.CLIENT) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized to update users.");
         }
-        if (currentUser.getRole() == UserRole.OPERATOR && (userToUpdate.getRole() == UserRole.ADMIN || userInRepository.get().getRole() == UserRole.ADMIN)) {
+        if (currentUser.getRole() == UserRole.OPERATOR && (role.getRole() == UserRole.ADMIN || userInRepository.get().getRole() == UserRole.ADMIN)) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized to set role higher than self.");
         }
-
-        this.userRepository.update(username, userToUpdate.getPassword(), userToUpdate.getRole());
+        this.userRepository.updateUserRole(username, role.getRole());
         return new ResponseEntity<>("Usuário alterado.", HttpStatus.OK);
     }
 

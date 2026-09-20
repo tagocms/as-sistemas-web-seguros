@@ -19,6 +19,6 @@ public interface UserRepository extends CrudRepository<User, String> {
     boolean create(@Param("username") String username, @Param("password") String password, @Param("role") UserRole role);
 
     @Modifying
-    @Query("UPDATE USERS SET password = :password, role = :role WHERE username = :username")
-    boolean update(@Param("username") String username, @Param("password") String password, @Param("role") UserRole role);
+    @Query("UPDATE USERS SET role = :role WHERE username = :username")
+    boolean updateUserRole(@Param("username") String username, @Param("role") UserRole role);
 }
